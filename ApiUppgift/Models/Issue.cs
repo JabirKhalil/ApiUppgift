@@ -12,6 +12,7 @@ namespace ApiUppgift.Models
         public long CustomerId { get; set; }
         public DateTime IssueStart { get; set; }
         public DateTime? IssueChange { get; set; }
+        public string IssueStatus { get; set; }
 
         public virtual Administrator Administrator { get; set; }
         public virtual Customer Customer { get; set; }

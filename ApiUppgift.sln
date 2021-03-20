@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30907.101
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiUppgift", "ApiUppgift\ApiUppgift.csproj", "{B4C5B2E8-2104-48A3-A127-5502AE537395}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiUppgift", "ApiUppgift\ApiUppgift.csproj", "{B4C5B2E8-2104-48A3-A127-5502AE537395}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

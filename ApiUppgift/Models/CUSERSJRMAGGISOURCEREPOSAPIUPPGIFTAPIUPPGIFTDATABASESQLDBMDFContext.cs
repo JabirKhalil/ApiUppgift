@@ -20,8 +20,7 @@ namespace ApiUppgift.Models
         public virtual DbSet<Administrator> Administrators { get; set; }
         public virtual DbSet<Customer> Customers { get; set; }
         public virtual DbSet<Issue> Issues { get; set; }
-        
-
+        public virtual DbSet<SessionToken> SessionTokens { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -84,6 +83,10 @@ namespace ApiUppgift.Models
 
                 entity.Property(e => e.IssueStart).HasColumnType("datetime");
 
+                entity.Property(e => e.IssueStatus)
+                    .IsRequired()
+                    .HasMaxLength(15);
+
                 entity.HasOne(d => d.Administrator)
                     .WithMany(p => p.Issues)
                     .HasForeignKey(d => d.AdministratorId)
@@ -95,6 +98,15 @@ namespace ApiUppgift.Models
                     .HasForeignKey(d => d.CustomerId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__Issue__CustomerI__286302EC");
+            });
+
+            modelBuilder.Entity<SessionToken>(entity =>
+            {
+                entity.ToTable("SessionToken");
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.AccessToken).IsRequired();
             });
 
             OnModelCreatingPartial(modelBuilder);

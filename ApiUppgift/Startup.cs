@@ -1,5 +1,6 @@
 using ApiUppgift.Models;
 using ApiUppgift.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -9,10 +10,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace ApiUppgift
@@ -31,6 +34,79 @@ namespace ApiUppgift
         {
             services.AddDbContext<CUSERSJRMAGGISOURCEREPOSAPIUPPGIFTAPIUPPGIFTDATABASESQLDBMDFContext>(options => options.UseSqlServer(Configuration.GetConnectionString("SqlConnection")));
             services.AddScoped<IIdentityService, IdentityService>();
+            services.AddCors();
+            //services.AddAuthentication(a => {
+            //    a.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            //    a.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme; 
+
+            //})
+            //    .AddJwtBearer(jwt => 
+
+            //    jwt.Events = new JwtBearerEvents
+            //                                  {
+            //                                      OnTokenValidated = context =>
+            //                                      {
+
+            //                                          var adminId = long.Parse(context.Principal.FindFirst("AdminId").Value);
+            //                                          if (adminId <= 0)
+            //                                          {
+            //                                              context.Fail("Unauthorized");
+
+            //                                              var expires = DateTime.Parse(context.Principal.FindFirst("Expires").Value);
+            //                                              if (DateTime.Now > expires)
+            //                                              {
+            //                                                  context.Fail("Unauthorized");
+            //                                                  return Task.CompletedTask;
+            //                                              }
+            //                                          };
+
+            //                                          jwt.RequireHttpsMetadata = true;
+            //                                          jwt.SaveToken = true;
+            //                                          jwt.TokenValidationParameters = new TokenValidationParameters
+            //                                          {
+            //                                              ValidateIssuer = false,
+            //                                              ValidateIssuerSigningKey = true,
+            //                                              ValidateAudience = false,
+            //                                              IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration.GetSection("SecretKey").Value))
+            //                                          };
+            //                                      });
+
+
+            services.AddAuthentication(a =>
+            {
+                a.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                a.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(jwt =>
+            {
+                jwt.Events = new JwtBearerEvents
+                {
+                    OnTokenValidated = context =>
+                    {
+                        var userId = long.Parse(context.Principal.FindFirst("AdminId").Value);
+                        if (userId <= 0)
+                            context.Fail("Unauthorized");
+
+                        var expires = DateTime.Parse(context.Principal.FindFirst("Expires").Value);
+                        if (DateTime.Now > expires)
+                            context.Fail("Unauthorized");
+
+                        return Task.CompletedTask;
+                    }
+                };
+
+                jwt.RequireHttpsMetadata = true;
+                jwt.SaveToken = true;
+                jwt.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = false,
+                    ValidateIssuerSigningKey = true,
+                    ValidateAudience = false,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration.GetSection("SecretKey").Value))
+                };
+            });
+
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -51,6 +127,7 @@ namespace ApiUppgift
             app.UseHttpsRedirection();
 
             app.UseRouting();
+            app.UseCors(c => c.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
             app.UseAuthentication();
 
             app.UseAuthorization();

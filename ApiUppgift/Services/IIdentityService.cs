@@ -8,7 +8,8 @@ namespace ApiUppgift.Services
 {
     public interface IIdentityService
     {
-        Task<bool> CreateAdminAsync(SignUp model);
-        Task<SignInResponseModel> SignInAdminAsync(string email, string password);
+        //Task<bool> CreateAdminAsync(SignUp model);
+        ////Task<SignInResponseModel> SignInAdminAsync(string email, string password);
+        //Task<IEnumerable<AdminResponse>> GetAdminAsync(long currentId, string token);
     }
 }
