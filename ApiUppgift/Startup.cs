@@ -33,7 +33,7 @@ namespace ApiUppgift
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<CUSERSJRMAGGISOURCEREPOSAPIUPPGIFTAPIUPPGIFTDATABASESQLDBMDFContext>(options => options.UseSqlServer(Configuration.GetConnectionString("SqlConnection")));
-            services.AddScoped<IIdentityService, IdentityService>();
+            //services.AddScoped<IIdentityService, IdentityService>();
             services.AddCors();
             //services.AddAuthentication(a => {
             //    a.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

@@ -22,12 +22,14 @@ namespace ApiUppgift.Controllers
     public class AdministratorController : ControllerBase
     {
         private readonly CUSERSJRMAGGISOURCEREPOSAPIUPPGIFTAPIUPPGIFTDATABASESQLDBMDFContext _context;
-        private readonly IIdentityService _identity;
+        
         private IConfiguration _configuration { get; }
-        public AdministratorController(IIdentityService identity, CUSERSJRMAGGISOURCEREPOSAPIUPPGIFTAPIUPPGIFTDATABASESQLDBMDFContext context, IConfiguration  configuration)
+        public AdministratorController(CUSERSJRMAGGISOURCEREPOSAPIUPPGIFTAPIUPPGIFTDATABASESQLDBMDFContext context, IConfiguration  configuration)
         {
             _context = context;
-            _identity = identity;
+            _configuration = configuration;
+
+
         }
         [AllowAnonymous]
         [HttpPost("signup")]
@@ -82,43 +84,87 @@ namespace ApiUppgift.Controllers
 
         [AllowAnonymous]
         [HttpPost("signin")]
-        public async Task<IActionResult> SignInAdminAsync(SignIn signIn)
+        public async Task<IActionResult> SignInAdminAsync([FromBody] SignIn signIn)
         {
 
-           
-                var admin = await _context.Administrators.FirstOrDefaultAsync(admin => admin.Email == signIn.Email);
+            try
+            {
+                var user = await _context.Administrators.FirstOrDefaultAsync(u => u.Email == u.Email);
 
-                if (admin != null)
+                if (user != null)
                 {
-                    try
+                    if (user.ValidatePasswordHash(signIn.Password))
                     {
-                        if (admin.ValidatePasswordHash(signIn.Password))
+                        var th = new JwtSecurityTokenHandler();
+                        var expiresDate = DateTime.Now.AddDays(1);
+
+                        var td = new SecurityTokenDescriptor
                         {
-                            var tokenHandler = new JwtSecurityTokenHandler();
-                            
-                            var expiresDate = DateTime.Now.AddHours(1);
-                            var tokenDescriptor = new SecurityTokenDescriptor
+                            Subject = new ClaimsIdentity(new Claim[]
                             {
-                                Subject = new ClaimsIdentity(new Claim[] { new Claim("AdminId", admin.Id.ToString()), new Claim("Expires", expiresDate.ToString()) }),
-                                Expires = expiresDate,
-                                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("SecretKey").Value)),
-                                SecurityAlgorithms.HmacSha512Signature)
-                            };
+                                    new Claim("UserId", user.Id.ToString()),
+                                    new Claim("Expires", expiresDate.ToString())
+                            }),
+                            Expires = expiresDate,
+                            SigningCredentials = new SigningCredentials(
+                                new SymmetricSecurityKey(
+                                    Encoding.UTF8.GetBytes(_configuration.GetSection("SecretKey").Value)),
+                                    SecurityAlgorithms.HmacSha512Signature
+                                )
+                        };
 
-                            var _accessToken = tokenHandler.WriteToken(tokenHandler.CreateToken(tokenDescriptor));
-                            return new OkObjectResult(_accessToken);
-                        }
+                        var _accessToken = th.WriteToken(th.CreateToken(td));
 
-
+                        return new OkObjectResult(_accessToken);
                     }
-
-                    catch { }
                 }
+            }
+            catch (Exception ex) { return new BadRequestObjectResult(ex.Message); }
 
             return new BadRequestResult();
 
 
         }
+    }
+
+        //    try
+        //    {
+        //        var user = await _context.Administrators.FirstOrDefaultAsync(u => u.Email == u.Email);
+
+            //        if (user != null)
+            //        {
+            //            if (user.ValidatePasswordHash(signUp.Password))
+            //            {
+            //                var th = new JwtSecurityTokenHandler();
+            //                var expiresDate = DateTime.Now.AddDays(1);
+
+            //                var td = new SecurityTokenDescriptor
+            //                {
+            //                    Subject = new ClaimsIdentity(new Claim[]
+            //                    {
+            //                        new Claim("UserId", user.Id.ToString()),
+            //                        new Claim("Expires", expiresDate.ToString())
+            //                    }),
+            //                    Expires = expiresDate,
+            //                    SigningCredentials = new SigningCredentials(
+            //                        new SymmetricSecurityKey(
+            //                            Encoding.UTF8.GetBytes(_configuration.GetSection("SecretKey").Value)),
+            //                            SecurityAlgorithms.HmacSha512Signature
+            //                        )
+            //                };
+
+            //                var _accessToken = th.WriteToken(th.CreateToken(td));
+
+            //                return new OkObjectResult(_accessToken);
+            //            }
+            //        }
+            //    }
+            //    catch (Exception ex) { return new BadRequestObjectResult(ex.Message); }
+
+            //    return new BadRequestResult();
+
+
+            //}
 
 
 
@@ -131,5 +177,5 @@ namespace ApiUppgift.Controllers
             //    return await _identity.GetAdminAsync();
             //}
 
-        }
+        
 }
