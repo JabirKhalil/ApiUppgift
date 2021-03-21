@@ -14,7 +14,7 @@ namespace ApiUppgift.Controllers
     [Route("api/[controller]")]
     [ApiController]
     //[AuthBasic]
-    //[AccessingAuth]
+    [AccessingAuth]
     public class CustomersController : ControllerBase
     {
         private readonly CUSERSJRMAGGISOURCEREPOSAPIUPPGIFTAPIUPPGIFTDATABASESQLDBMDFContext _context;

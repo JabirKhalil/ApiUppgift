@@ -12,7 +12,7 @@ namespace ApiUppgift.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[AccessingAuth]
+    [AccessingAuth]
     public class IssuesController : ControllerBase
     {
         private readonly CUSERSJRMAGGISOURCEREPOSAPIUPPGIFTAPIUPPGIFTDATABASESQLDBMDFContext _context;
@@ -23,10 +23,17 @@ namespace ApiUppgift.Controllers
         }
 
         // GET: api/Issues
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Issue>>> GetIssues()
+       [HttpGet("{orderby}")]
+        
+        public async Task<ActionResult<IEnumerable<Issue>>> GetIssues(string orderby)
+       
         {
-            return await _context.Issues.Include(i => i.Administrator).Include(i => i.Customer).ToListAsync();
+            if (DateTime.TryParse(orderby, out var datetime))
+            {
+                return await _context.Issues.OrderBy(i => i.Customer.FirstName).ThenBy(i => i.IssueStart > datetime).ThenBy(i => i.IssueStatus).ToListAsync();
+            }
+
+            return await _context.Issues.Include(i => i.Customer).ToListAsync();
         }
 
         // GET: api/Issues/5

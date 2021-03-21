@@ -15,7 +15,7 @@ namespace ApiUppgift.Auth
        
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            if(!context.HttpContext.Request.Headers.TryGetValue("AccessKey", out var provideAccessKey))
+            if(!context.HttpContext.Request.Query.TryGetValue("AccessKey", out var provideAccessKey ))
             {
                 context.Result = new UnauthorizedResult();
                 return;
