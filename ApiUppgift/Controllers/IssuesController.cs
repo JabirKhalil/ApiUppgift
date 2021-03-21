@@ -6,11 +6,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ApiUppgift.Models;
+using ApiUppgift.Auth;
 
 namespace ApiUppgift.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    //[AccessingAuth]
     public class IssuesController : ControllerBase
     {
         private readonly CUSERSJRMAGGISOURCEREPOSAPIUPPGIFTAPIUPPGIFTDATABASESQLDBMDFContext _context;
@@ -24,7 +26,7 @@ namespace ApiUppgift.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Issue>>> GetIssues()
         {
-            return await _context.Issues.ToListAsync();
+            return await _context.Issues.Include(i => i.Administrator).Include(i => i.Customer).ToListAsync();
         }
 
         // GET: api/Issues/5

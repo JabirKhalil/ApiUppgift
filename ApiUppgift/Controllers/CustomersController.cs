@@ -6,11 +6,15 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ApiUppgift.Models;
+using ApiUppgift.Auth;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ApiUppgift.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    //[AuthBasic]
+    //[AccessingAuth]
     public class CustomersController : ControllerBase
     {
         private readonly CUSERSJRMAGGISOURCEREPOSAPIUPPGIFTAPIUPPGIFTDATABASESQLDBMDFContext _context;

@@ -35,6 +35,9 @@ namespace ApiUppgift
             services.AddDbContext<CUSERSJRMAGGISOURCEREPOSAPIUPPGIFTAPIUPPGIFTDATABASESQLDBMDFContext>(options => options.UseSqlServer(Configuration.GetConnectionString("SqlConnection")));
             //services.AddScoped<IIdentityService, IdentityService>();
             services.AddCors();
+            services.AddMvc(Options => Options.EnableEndpointRouting = false)
+                .SetCompatibilityVersion(CompatibilityVersion.Latest)
+                .AddNewtonsoftJson(Options => Options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
             //services.AddAuthentication(a => {
             //    a.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
             //    a.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme; 
